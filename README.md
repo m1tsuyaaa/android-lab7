@@ -13,6 +13,7 @@
 | `lunch-tray/` | Задание 3 — навигация в Lunch Tray (контрольное задание) |
 | `my-city/` | Задание 4 — приложение «Мой город» с нуля (контрольное задание) |
 | `report_content.txt`, `build_report.ps1` | Исходники для пересборки отчёта в DOCX |
+| `report_screenshots/` | 11 скриншотов эмулятора, встроенных в отчёт (рисунки 4.1–4.6) |
 | `verify_lab7.ps1`, `verify_results.txt` | Статическая проверка ключевых элементов реализации |
 
 ## Открытие в Android Studio (пошагово)
@@ -48,15 +49,15 @@ cd cupcake        # reply / lunch-tray / my-city
 .\gradlew.bat assembleDebug
 ```
 
-## Добавление скриншотов в отчёт
+## Скриншоты в отчёте
 
-В отчёте есть раздел 4.2 с таблицей ожидаемых результатов и раздел 4.3 с заготовками под изображения. После запуска приложений вставьте скриншоты в DOCX в соответствующие места (в Word: **Вставка → Рисунки**), подпишите их по образцу «Рисунок 4.1 — …» и пересохраните файл.
+Скриншоты уже встроены в DOCX (раздел 4.3, рисунки 4.1–4.6, всего 11 изображений), ничего вручную вставлять не нужно. Они получены в эмуляторе Pixel 4 (API 30) после установки APK через `adb install -r`; для Reply размер окна изменялся через `adb shell wm size` / `wm density`, чтобы показать режимы COMPACT, MEDIUM и EXPANDED. Экраны Cupcake для рисунка 4.1 сняты инструментальным тестом `cupcake/app/src/androidTest/java/com/example/cupcake/test/ScreenshotCaptureTest.kt`. Исходные PNG-файлы лежат в `report_screenshots/`.
 
 ## Пересборка отчёта
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File build_report.ps1 `
-  -ContentFile report_content.txt -OutputFile report.docx -RootDir .
+  -ContentFile report_content.txt -OutputFile "Отчёт_по_лабораторной_работе_7.docx" -RootDir .
 ```
 
 Скрипт собирает DOCX напрямую из OOXML (без Word COM), поэтому работает даже в окружении без доступной автоматизации Office. Все листинги вставляются из реальных файлов проектов, указанных в `report_content.txt`.

@@ -9,8 +9,10 @@ Add-Type -AssemblyName System.IO.Compression
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 $script:sb = New-Object System.Text.StringBuilder
+$script:imageRels = @()
 function W([string]$s) { [void]$script:sb.Append($s) }
 function E([string]$s) { return [System.Security.SecurityElement]::Escape($s) }
+Add-Type -AssemblyName System.Drawing
 
 function Add-Para {
     param(
@@ -58,6 +60,41 @@ function Add-CodeFile([string]$RelPath) {
     Add-Para -Text "" -Font "Calibri" -Size 12 -After 80
 }
 
+function Add-Image([string]$RelName) {
+    $shotDir = Join-Path $RootDir "report_screenshots"
+    $full = Join-Path $shotDir $RelName
+    if (-not (Test-Path -LiteralPath $full)) {
+        Add-Para -Text ("[IMAGE NOT FOUND: " + $RelName + "]") -Font "Calibri" -Size 18 -Italic $true -Align "center"
+        return
+    }
+    $bytes = [System.IO.File]::ReadAllBytes($full)
+    $img = [System.Drawing.Image]::FromFile($full)
+    $wpx = $img.Width
+    $hpx = $img.Height
+    $img.Dispose()
+    $maxW = 5486400
+    $maxH = 6400800
+    if ($wpx -le 0) { $wpx = 1080 }
+    if ($hpx -le 0) { $hpx = 1920 }
+    $scale = [Math]::Min(($maxW / $wpx), ($maxH / $hpx))
+    if ($scale -gt 1) { $scale = 1 }
+    $cx = [int]($wpx * $scale)
+    $cy = [int]($hpx * $scale)
+    $rid = "rId" + (3 + $script:imageRels.Count)
+    $script:imageRels += [pscustomobject]@{ Id = $rid; Name = $RelName; Bytes = $bytes }
+    $id = $script:imageRels.Count
+    $xml = "<w:p><w:pPr><w:jc w:val='center'/><w:spacing w:before='60' w:after='160'/></w:pPr><w:r><w:drawing>"
+    $xml += "<wp:inline distT='0' distB='0' distL='0' distR='0' xmlns:wp='http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing'>"
+    $xml += "<wp:extent cx='$cx' cy='$cy'/><wp:effectExtent l='0' t='0' r='0' b='0'/>"
+    $xml += "<wp:docPr id='$id' name='Picture $id'/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a='http://schemas.openxmlformats.org/drawingml/2006/main' noChangeAspect='1'/></wp:cNvGraphicFramePr>"
+    $xml += "<a:graphic xmlns:a='http://schemas.openxmlformats.org/drawingml/2006/main'><a:graphicData uri='http://schemas.openxmlformats.org/drawingml/2006/picture'>"
+    $xml += "<pic:pic xmlns:pic='http://schemas.openxmlformats.org/drawingml/2006/picture'><pic:nvPicPr><pic:cNvPr id='$id' name='$RelName'/><pic:cNvPicPr/></pic:nvPicPr>"
+    $xml += "<pic:blipFill><a:blip r:embed='$rid'/><a:stretch><a:fillRect/></a:stretch></pic:blipFill>"
+    $xml += "<pic:spPr><a:xfrm><a:off x='0' y='0'/><a:ext cx='$cx' cy='$cy'/></a:xfrm><a:prstGeom prst='rect'><a:avLst/></a:prstGeom></pic:spPr>"
+    $xml += "</pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>"
+    W $xml
+}
+
 $lines = Get-Content -LiteralPath $ContentFile -Encoding UTF8
 W '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
 W '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><w:body>'
@@ -77,6 +114,7 @@ foreach ($raw in $lines) {
     if ($line -like "@@BULLET@@*")    { Add-Para ("*  " + $line.Substring(10).Trim()) "Calibri" 24 $false $false "" 0 60 360; continue }
     if ($line -like "@@P@@*")         { Add-Para ($line.Substring(5).Trim())  "Calibri" 24 $false $false "both"  0   140; continue }
     if ($line -like "@@CODE@@*")      { Add-CodeFile $line.Substring(8).Trim(); continue }
+    if ($line -like "@@IMG@@*")       { Add-Image $line.Substring(7).Trim(); continue }
     if ($line -like "@@RAWCODE@@*")   { Add-CodeLine $line.Substring(11); continue }
     if ($line -eq "")                 { Add-Para "" "Calibri" 12 -After 80; continue }
     Add-Para $line "Calibri" 24 $false $false "both" 0 140
@@ -97,6 +135,7 @@ $contentTypes = @'
 <Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
 <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
 <Default Extension="xml" ContentType="application/xml"/>
+<Default Extension="png" ContentType="image/png"/>
 <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
 <Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
 <Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/>
@@ -119,8 +158,11 @@ $docRels = @'
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
 <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/>
 <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
-</Relationships>
 '@
+foreach ($ir in $script:imageRels) {
+    $docRels += "<Relationship Id='$($ir.Id)' Type='http://schemas.openxmlformats.org/officeDocument/2006/relationships/image' Target='media/$($ir.Name)'/>`n"
+}
+$docRels += "</Relationships>"
 
 $stylesXml = @'
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -178,6 +220,11 @@ try {
             $stream = $entry.Open()
             $writer = New-Object System.IO.StreamWriter($stream, $enc)
             try { $writer.Write($parts[$name]) } finally { $writer.Dispose() }
+        }
+        foreach ($ir in $script:imageRels) {
+            $entry = $zip.CreateEntry("word/media/$($ir.Name)", [System.IO.Compression.CompressionLevel]::Optimal)
+            $stream = $entry.Open()
+            try { $stream.Write($ir.Bytes, 0, $ir.Bytes.Length) } finally { $stream.Dispose() }
         }
     } finally { $zip.Dispose() }
 } finally { $fs.Dispose() }

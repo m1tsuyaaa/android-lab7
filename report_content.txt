@@ -106,21 +106,26 @@
 @@RAWCODE@@│ Unfolded foldable      │ MEDIUM              │ NavigationRail               │ LIST_ONLY                │
 @@RAWCODE@@│ Tablet (ландшафт)      │ EXPANDED            │ PermanentNavigationDrawer    │ LIST_AND_DETAIL          │
 @@RAWCODE@@└────────────────────────┴─────────────────────┴──────────────────────────────┴──────────────────────────┘
-@@NOTE@@Примечание: скриншоты эмулятора добавляются студентом после запуска проектов в Android Studio. В данном отчёте приведены описания проверок и листинги кода.
-@@H2@@4.3. Места для добавления скриншотов
-@@P@@Ниже оставлены заготовки под изображения. После запуска проектов вставьте скриншоты в отчёт через меню Word «Вставка → Рисунки» и замените текстовые подсказки на подписи рисунков.
-@@CAPTION@@Рисунок 4.1 — Cupcake: стартовый экран, выбор вкуса и итоговый заказ (добавить студентом)
-@@P@@[Место для скриншота 4.1]
-@@CAPTION@@Рисунок 4.2 — Reply: Phone / COMPACT — нижняя навигация, список писем (добавить студентом)
-@@P@@[Место для скриншота 4.2]
-@@CAPTION@@Рисунок 4.3 — Reply: Unfolded foldable / MEDIUM — Navigation rail (добавить студентом)
-@@P@@[Место для скриншота 4.3]
-@@CAPTION@@Рисунок 4.4 — Reply: Tablet landscape / EXPANDED — постоянный drawer и list-detail (добавить студентом)
-@@P@@[Место для скриншота 4.4]
-@@CAPTION@@Рисунок 4.5 — Lunch Tray: экран заказа и экран подтверждения (добавить студентом)
-@@P@@[Место для скриншота 4.5]
-@@CAPTION@@Рисунок 4.6 — «Мой город»: список мест и детали на компактном и широком экране (добавить студентом)
-@@P@@[Место для скриншота 4.6]
+@@NOTE@@Примечание: скриншоты получены в эмуляторе Android (AVD Pixel 4, API 30) после сборки проектов и установки APK через adb. Изображения хранятся в папке report_screenshots и встроены в данный документ.
+@@H2@@4.3. Скриншоты работающих приложений
+@@P@@Ниже приведены снимки экранов, полученные после успешной сборки и запуска приложений. Для Reply дополнительно использовалось изменение размеров окна эмулятора через adb shell wm size/wm density, что позволяет продемонстрировать все три адаптивных режима.
+@@CAPTION@@Рисунок 4.1 — Cupcake: стартовый экран, выбор вкуса и итоговый заказ
+@@IMG@@fig4_1_cupcake_start.png
+@@IMG@@fig4_1_cupcake_flavor.png
+@@IMG@@fig4_1_cupcake_summary.png
+@@CAPTION@@Рисунок 4.2 — Reply: Phone / COMPACT — нижняя навигация, список писем
+@@IMG@@fig4_2_reply_phone.png
+@@CAPTION@@Рисунок 4.3 — Reply: Unfolded foldable / MEDIUM — Navigation rail
+@@IMG@@fig4_3_reply_medium.png
+@@CAPTION@@Рисунок 4.4 — Reply: Tablet landscape / EXPANDED — постоянный drawer и list-detail
+@@IMG@@fig4_4_reply_expanded.png
+@@CAPTION@@Рисунок 4.5 — Lunch Tray: стартовый экран и выбор блюда
+@@IMG@@fig4_5_lunch_start.png
+@@IMG@@fig4_5_lunch_entree.png
+@@CAPTION@@Рисунок 4.6 — «Мой город»: список мест и детали на компактном и широком экране
+@@IMG@@fig4_6_city_list.png
+@@IMG@@fig4_6_city_detail.png
+@@IMG@@fig4_6_city_wide.png
 @@H2@@4.4. Результаты сборки
 @@P@@Все четыре проекта успешно собраны в среде Android Studio с JDK 17 и Android SDK 34 (команда assembleDebug). Дополнительно собраны инструментальные тесты Cupcake (assembleDebugAndroidTest). APK-файлы находятся в папках projects/app/build/outputs/apk/debug/ и могут быть установлены на устройство через adb install.
 @@CAPTION@@Таблица 4.2 — Результаты сборки проектов
