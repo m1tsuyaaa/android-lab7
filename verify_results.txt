@@ -1,0 +1,24 @@
+﻿OK   : Cupcake enum routes
+OK   : Cupcake NavHost
+OK   : Cupcake rememberNavController
+OK   : Cupcake popBackStack
+OK   : Cupcake shareOrder Intent
+OK   : Cupcake AppBar title
+OK   : Cupcake backStackEntry
+OK   : Cupcake tests
+OK   : Reply WindowSizeClass
+OK   : Reply NavigationType utils
+OK   : Reply Detail conditional
+OK   : Reply BackHandler
+OK   : Reply MainActivity size class
+OK   : Reply dependency
+OK   : LunchTray enum routes
+OK   : LunchTray NavHost
+OK   : LunchTray cancel
+OK   : MyCity settings
+OK   : MyCity manifest
+OK   : MyCity NavHost
+OK   : MyCity ViewModel
+OK   : MyCity data provider
+OK   : MyCity adaptive
+OK   : MyCity Coil

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Names, descriptions and addresses of the recommended places. -->
+<resources>
+    <string name="place_01_name">Аист</string>
+    <string name="place_01_description">Уютный ресторан русской кухни с видом на старый город и сезонным меню от шеф-повара.</string>
+    <string name="place_01_address">ул. Большая Дмитровка, 12</string>
+
+    <string name="place_02_name">Депо Москва</string>
+    <string name="place_02_description">Современный гастробар с открытой кухней, авторскими коктейлями и живой музыкой по выходным.</string>
+    <string name="place_02_address">ул. Лесная, 20с3</string>
+
+    <string name="place_03_name">White Rabbit</string>
+    <string name="place_03_description">Ресторан с панорамным видом на город и тщательно составленным меню из локальных продуктов.</string>
+    <string name="place_03_address">Смоленская пл., 3</string>
+
+    <string name="place_04_name">Грибоедов</string>
+    <string name="place_04_description">Классическая кухня в историческом здании: отличный выбор для неспешного обеда после прогулки.</string>
+    <string name="place_04_address">Тверской бул., 25</string>
+
+    <string name="place_05_name">Парк Горького</string>
+    <string name="place_05_description">Городской парк с набережной, велодорожками, открытыми площадками и летними киносеансами.</string>
+    <string name="place_05_address">Крымский Вал, 9</string>
+
+    <string name="place_06_name">Зарядье</string>
+    <string name="place_06_description">Ландшафтный парк с парящим мостом, пещерами, лекторием и видом на Кремль.</string>
+    <string name="place_06_address">Варварка, 6</string>
+
+    <string name="place_07_name">Сокольники</string>
+    <string name="place_07_description">Большой лесной массив с аллеями, прудами и маршрутами для прогулок и пробежек.</string>
+    <string name="place_07_address">ул. Сокольнический Вал, 1</string>
+
+    <string name="place_08_name">ВДНХ</string>
+    <string name="place_08_description">Выставочный комплекс с павильонами, фонтанами, музеями и катанием на канатной дороге.</string>
+    <string name="place_08_address">пр-т Мира, 150</string>
+
+    <string name="place_09_name">Кофемания</string>
+    <string name="place_09_description">Кофе собственной обжарки, завтраки весь день и большой выбор десертов.</string>
+    <string name="place_09_address">ул. Большая Никитская, 13</string>
+
+    <string name="place_10_name">Surf Coffee</string>
+    <string name="place_10_description">Спешелти-кофе, фильтр-кофе и завтраки в расслабленной атмосфере ближе к центру города.</string>
+    <string name="place_10_address">Новый Арбат, 21</string>
+
+    <string name="place_11_name">Даблби</string>
+    <string name="place_11_description">Микрообжарка, дружелюбные бариста и уютные столики для встреч и работы.</string>
+    <string name="place_11_address">ул. Покровка, 16</string>
+
+    <string name="place_12_name">Coffee Fellows</string>
+    <string name="place_12_description">Хороший кофе, свежая выпечка и много удобных мест с розетками для ноутбука.</string>
+    <string name="place_12_address">ул. Люсиновская, 28</string>
+
+    <string name="place_13_name">Октябрь</string>
+    <string name="place_13_description">Исторический кинотеатр с большим залом, современной проекцией и классическим интерьером.</string>
+    <string name="place_13_address">Новый Арбат, 24</string>
+
+    <string name="place_14_name">Художественный</string>
+    <string name="place_14_description">Старейший кинотеатр города: авторские показы, ретроспективы и уютный зрительный зал.</string>
+    <string name="place_14_address">Арбат, 20/2</string>
+
+    <string name="place_15_name">Формула Кино Авиапарк</string>
+    <string name="place_15_description">Современные залы с удобными креслами и отличным звуком прямо в торговом центре.</string>
+    <string name="place_15_address">Ходынский бул., 4</string>
+
+    <string name="place_16_name">Мир</string>
+    <string name="place_16_description">Камерный кинотеатр с интересной афишей и приятными ценами на билеты.</string>
+    <string name="place_16_address">ул. Земляной Вал, 33</string>
+
+    <string name="place_17_name">Авиапарк</string>
+    <string name="place_17_description">Один из крупнейших торговых центров: магазины, фудкорт, кинотеатр и аквапарк.</string>
+    <string name="place_17_address">Ходынский бул., 4</string>
+
+    <string name="place_18_name">Европейский</string>
+    <string name="place_18_description">Магазины и рестораны прямо на площади Киевского вокзала, удобно заглянуть по дороге.</string>
+    <string name="place_18_address">пл. Киевского вокзала, 2</string>
+
+    <string name="place_19_name">Афимолл Сити</string>
+    <string name="place_19_description">Торговый центр в деловом районе с бутиками, панорамными окнами и отличной кухней на фудкорте.</string>
+    <string name="place_19_address">Пресненская наб., 2</string>
+
+    <string name="place_20_name">Метрополис</string>
+    <string name="place_20_description">Много магазинов, развлечений и кафе — хороший план на дождливый день.</string>
+    <string name="place_20_address">Ленинградское ш., 16А</string>
+</resources>

@@ -1,0 +1,135 @@
+@@TITLE@@Лабораторная работа № 7
+@@SUBTITLE@@Навигация. Адаптив под разный формат экрана
+@@CENTER@@по дисциплине «Разработка мобильных приложений»
+@@CENTER@@(Jetpack Compose, Android)
+@@PAGE@@
+@@COVERINFO@@Выполнил(а): студент(ка) группы ______________________
+@@COVERINFO@@Проверил(а): _________________________________________
+@@COVERINFO@@Дата выполнения: «___» _______________ 2026 г.
+@@PAGE@@
+@@H1@@1. Цель работы
+@@P@@Цель лабораторной работы — научиться реализовывать навигацию в приложениях Android с помощью библиотеки Jetpack Navigation Compose, а также научиться адаптировать пользовательский интерфейс под широкий формат экрана (планшеты, складные устройства, окна десктопного типа).
+@@P@@В ходе работы решаются следующие задачи:
+@@BULLET@@изучить основные понятия навигации Compose: host, graph, controller, destination, route;
+@@BULLET@@реализовать навигацию между экранами приложения Cupcake с помощью NavHost и NavController;
+@@BULLET@@реализовать передачу данных между экранами, сброс состояния и общий доступ к системному меню «Поделиться»;
+@@BULLET@@добавить динамические заголовки экранов, кнопку «Назад» и обработку системной кнопки возврата;
+@@BULLET@@реализовать адаптивные макеты приложения Reply на основе классов размера окна (Window Size Classes);
+@@BULLET@@выполнить контрольные задания: добавить навигацию в Lunch Tray и создать приложение «Мой город»;
+@@BULLET@@написать инструментальные тесты навигации и сформулировать выводы по проделанной работе.
+@@H1@@2. Теоретические сведения
+@@H2@@2.1. Навигация в Jetpack Compose
+@@P@@Современные приложения Android, как правило, состоят из нескольких экранов, между которыми пользователь перемещается. Фреймворк Jetpack Navigation включает библиотеку навигации, подключаемый модуль Safe Args и инструменты для работы с глубокими ссылками и обратным стеком. Компонент Navigation Compose позволяет описывать навигацию декларативно, так же, как описывается пользовательский интерфейс.
+@@P@@Основные понятия навигации:
+@@BULLET@@host — элемент пользовательского интерфейса, содержащий текущий пункт назначения; при перемещении по приложению хост меняет пункты назначения;
+@@BULLET@@graph — структура данных, описывающая все навигационные направления приложения и связи между ними;
+@@BULLET@@controller (NavHostController) — объект, управляющий навигацией, глубокими ссылками и обратным стеком; создаётся функцией rememberNavController(), которая сохраняет стек при рекомпозиции;
+@@BULLET@@destination — узел графа навигации, отображающий своё содержимое при переходе к нему;
+@@BULLET@@route — уникальный строковый идентификатор маршрута, ведущего к пункту назначения.
+@@P@@Перед реализацией навигации определяют перечень экранов и маршрутов и оформляют их в виде enum class (для простых приложений) или sealed class (когда маршруты несут данные). Граф навигации описывается в NavHost: в него передаются контроллер, стартовый маршрут (startDestination), модификатор и завершающая лямбда с вызовами composable(route) { ... }. Переход выполняется методом navController.navigate(route), при этом маршрут помещается в back stack, поэтому системная кнопка «Назад» возвращает пользователя на предыдущий экран.
+@@P@@Для управления стеком применяются методы popBackStack() и popUpTo(). Параметр inclusive = false сохраняет указанный маршрут в стеке и делает его верхним (возврат на стартовый экран без возможности «назад»), а inclusive = true удаляет и сам маршрут (переход на предыдущий экран с возможностью вернуться ещё раз). Получить стартовый маршрут можно через navController.graph.findStartDestination().
+@@P@@Чтобы поддержать принцип UDF (unidirectional data flow), состояние выносится в ViewModel: обработчики интерфейса вызывают методы ViewModel, а UI реагирует на изменение состояния. Для перехода между приложениями используется Intent ACTION_SEND и системный ShareSheet, который не является частью навигационного графа приложения.
+@@H2@@2.2. Адаптивный интерфейс и классы размера окна
+@@P@@С выходом Android 16 поддержка широкоформатных экранов стала требованием к публикации приложений в Play Market. Основные правила адаптивной разработки: не использовать фиксированных размеров; классифицировать доступное пространство окна на компактное, среднее и расширенное; использовать библиотеку Compose Material 3 Adaptive; применять рекомендованные шаблоны макетов.
+@@P@@Библиотека WindowSizeClass (material3-window-size-class) автоматически вычисляет доступное приложению пространство и возвращает класс размера окна по ширине и по высоте:
+@@BULLET@@Compact (COMPACT) — ширина менее 600 dp, типичный телефон в портретной ориентации;
+@@BULLET@@Medium (MEDIUM) — ширина от 600 до 839 dp, телефон в альбомной ориентации, небольшой планшет, раскрытый складной телефон;
+@@BULLET@@Expanded (EXPANDED) — ширина 840 dp и более, планшет и десктопные окна.
+@@P@@Ширина и высота классифицируются отдельно; класс размера окна является динамическим и меняется при повороте устройства, изменении размера окна, переходе в режим разделённого экрана или складывании устройства. Поэтому макет должен перестраиваться в момент рекомпозиции.
+@@P@@Рекомендованные адаптивные макеты:
+@@BULLET@@List-detail — окно делится на список и панель деталей; на широких экранах обе панели видны одновременно, на компактных показывается либо список, либо детали (с BackHandler для возврата к списку);
+@@BULLET@@Feed — сетка эквивалентных элементов контента на базе LazyVerticalGrid; на компактных экранах сетка вырождается в LazyColumn;
+@@BULLET@@Supporting pane — основная область (около 70 % на широком экране) и вспомогательная панель (30 %), которая имеет смысл только вместе с основным контентом.
+@@P@@Элементы навигации тоже выбираются по размеру окна: нижняя панель для компактных экранов, navigation rail для средних, постоянный navigation drawer для расширенных. Состояние (текущий экран, выбранный элемент, класс размера окна) рекомендуется поднимать вверх по дереву компонентов, чтобы соблюдать UDF и корректно обрабатывать системную кнопку «Назад» (BackHandler либо activity.finish() для широкоформатного режима).
+@@H1@@3. Ход выполнения работы
+@@P@@Работа выполнялась в Android Studio на трёх стартовых проектах Google Developer Training (cupcake, reply-app, lunch-tray) и в новом проекте, созданном с нуля. Ниже описана реализация каждого задания и приведены ключевые листинги кода.
+@@H2@@3.1. Задание 1. Навигация в приложении Cupcake
+@@P@@Стартовый проект cupcake содержит экраны StartOrderScreen (выбор количества кексов), SelectOptionScreen (переиспользуемый экран выбора вкуса и даты) и OrderSummaryScreen (итоги заказа). В пакете ui/components находится компонент FormattedPriceLabel, а состояние заказа хранится в OrderViewModel.
+@@P@@Шаг 1. В файле CupcakeScreen.kt добавлен enum class CupcakeScreen с четырьмя маршрутами и заголовками экранов в виде строковых ресурсов:
+@@CODE@@cupcake/app/src/main/java/com/example/cupcake/CupcakeScreen.kt
+@@P@@Шаг 2. Внутри Scaffold функции CupcakeApp создаётся NavHostController, вычисляется текущая запись back stack и текущий экран. На основе маршрута формируется заголовок AppBar, кнопка «Назад» показывается только при наличии предыдущей записи в стеке. Граф навигации содержит четыре пункта назначения; экран выбора вкуса получает список строк, преобразованный из идентификаторов ресурсов через LocalContext.current.resources.getString(id).
+@@P@@Шаг 3. Обработчики кнопок выносят обновление состояния в ViewModel и выполняют переход: Start → Flavor → Pickup → Summary. Функция cancelOrderAndNavigateToStart() сбрасывает заказ и вызывает popBackStack(CupcakeScreen.Start.name, inclusive = false), удаляя все экраны из стека. Функция shareOrder() формирует Intent ACTION_SEND с темой и текстом заказа и показывает системный ShareSheet через Intent.createChooser().
+@@P@@Шаг 4. Экраны StartOrderScreen, SelectOptionScreen и OrderSummaryScreen получили лямбды-обработчики (onNextButtonClicked, onCancelButtonClicked, onSendButtonClicked) с значениями по умолчанию для превью.
+@@CODE@@cupcake/app/src/main/java/com/example/cupcake/ui/SelectOptionScreen.kt
+@@CODE@@cupcake/app/src/main/java/com/example/cupcake/ui/StartOrderScreen.kt
+@@CODE@@cupcake/app/src/main/java/com/example/cupcake/ui/SummaryScreen.kt
+@@H2@@3.2. Задание 2. Адаптивная вёрстка приложения Reply
+@@P@@Стартовый проект reply — почтовый клиент с четырьмя категориями писем (входящие, отправленные, черновики, спам). Исходно переключение между списком и деталями осуществлялось через NavHost, а нижняя навигация использовалась на всех размерах экранов.
+@@P@@Шаг 1. Переключение экранов через состояние. В ReplyHomeScreen вызов ReplyAppContent обёрнут в условие replyUiState.isShowingHomepage; в ветви else отображается ReplyDetailsScreen. В ReplyDetailsScreen добавлен BackHandler, вызывающий onBackPressed(). Благодаря изменению состояния replyUiState приложение перекомпонуется без использования NavHostController.
+@@P@@Шаг 2. В MainActivity вычисляется windowSize = calculateWindowSizeClass(this) с аннотацией @OptIn(ExperimentalMaterial3WindowSizeClassApi::class); значение передаётся в ReplyApp. Зависимость material3-window-size-class добавлена в build.gradle.kts.
+@@CODE@@reply/app/src/main/java/com/example/reply/MainActivity.kt
+@@P@@Шаг 3. В новом файле ui/utils/WindowStateUtils.kt определены перечисления ReplyNavigationType и ReplyContentType и функции сопоставления их значений классу ширины окна:
+@@CODE@@reply/app/src/main/java/com/example/reply/ui/utils/WindowStateUtils.kt
+@@P@@Шаг 4. В ReplyApp на основе windowSize.widthSizeClass определяются тип навигации и тип контента, добавляется ветвление when и обновлены превью для компактного, среднего и расширенного экранов (widthDp 400 / 700 / 1000).
+@@CODE@@reply/app/src/main/java/com/example/reply/ui/ReplyApp.kt
+@@P@@Шаг 5. В ReplyHomeScreen для расширенных экранов используется PermanentNavigationDrawer с NavigationDrawerContent; для средних экранов в ReplyAppContent показан NavigationRail в AnimatedVisibility; для компактных — нижняя навигация. При contentType = LIST_AND_DETAIL вместо списка отображается комбинированный компонент ReplyListAndDetailContent, где подробности письма показываются рядом со списком без перехода на отдельный экран.
+@@CODE@@reply/app/src/main/java/com/example/reply/ui/ReplyHomeScreen.kt
+@@P@@Шаг 6. Компонент ReplyDetailsScreen получил параметр isFullScreen: в полноэкранном режиме показывается верхняя панель с кнопкой «Назад» и заголовок темы, во встроенном режиме (широкий экран) эти элементы скрываются, а отступы карточки адаптируются. Для широких экранов обработчик нажатия «Назад» вызывает activity.finish(): приложение закрывается, а не возвращается к списку.
+@@CODE@@reply/app/src/main/java/com/example/reply/ui/ReplyDetailsScreen.kt
+@@H2@@3.3. Задание 3. Контрольное задание «Lunch Tray»
+@@P@@В стартовом проекте lunch-tray реализовано оформление обеда: пять экранов (Start, Entree menu, Side dish menu, Accompaniment menu, Checkout), состояние заказа хранится в OrderViewModel. Требовалось добавить навигацию, динамический AppBar с заголовками и кнопкой «Назад», а также обработку кнопок Next / Send / Cancel.
+@@P@@Создан enum class LunchTrayScreen с ресурсами заголовков, NavHost с пятью пунктами назначения и StartOrder в качестве стартового экрана. Переходы между экранами выполняются в лямбдах onNextButtonClicked с одновременным вызовом методов ViewModel (setEntree, setSideDish, setAccompaniment). Кнопка Send на экране Checkout сбрасывает заказ и возвращает на Start; кнопка Cancel на любом экране сбрасывает заказ и вызывает popBackStack(Start.name, inclusive = false). Кнопка «Назад» в AppBar отображается только при previousBackStackEntry != null и вызывает navController.navigateUp().
+@@CODE@@lunch-tray/app/src/main/java/com/example/lunchtray/LunchTrayScreen.kt
+@@H2@@3.4. Задание 4. Контрольное задание «Мой город»
+@@P@@Приложение «Мой город» создано с нуля. Оно предназначено для рекомендаций интересных мест города и содержит пять категорий: рестораны, парки, кофейни, кинотеатры и торговые центры. В каждой категории описано по 3–5 мест с названием, адресом, описанием, рейтингом и фотографией (загружаются по URL с помощью Coil; на время загрузки показывается заглушка с иконкой категории).
+@@P@@Архитектура приложения разделена на слои:
+@@BULLET@@data — модели Place, Category, MyCityUiState и PlacesDataProvider (источник демонстрационных данных на 20 мест);
+@@BULLET@@ui — экраны MyCityApp, HomeScreen, CategoryScreen, PlaceDetailScreen и переиспользуемые компоненты PlaceCard, PlaceList, PlaceImage, PlaceDetails;
+@@BULLET@@ui/theme — тема Material 3;
+@@BULLET@@MyCityViewModel — состояние MyCityUiState и обработка событий выбора категории и места в стиле UDF.
+@@P@@Навигация построена на Jetpack Navigation Compose: enum class MyCityScreen хранит маршруты и заголовки, NavHost описывает переходы «категории → список мест → подробности». Адаптивность реализована через WindowWidthSizeClass: на компактных экранах список и подробности — отдельные экраны, на средних и расширенных используется двухпанельный макет list-detail; навигационные элементы выбираются в соответствии с рекомендациями Material Design.
+@@CODE@@my-city/app/src/main/java/com/example/mycity/ui/MyCityScreen.kt
+@@CODE@@my-city/app/src/main/java/com/example/mycity/ui/MyCityApp.kt
+@@CODE@@my-city/app/src/main/java/com/example/mycity/ui/MyCityViewModel.kt
+@@CODE@@my-city/app/src/main/java/com/example/mycity/data/PlacesDataProvider.kt
+@@H1@@4. Тестирование
+@@H2@@4.1. Инструментальные тесты навигации Cupcake
+@@P@@В файл app/build.gradle.kts добавлены зависимости для инструментального тестирования Compose (ui-test-junit4, ui-test-manifest, navigation-testing). Тесты используют createAndroidComposeRule<ComponentActivity>() и TestNavHostController, который подменяет «боевой» контроллер и позволяет проверять текущий маршрут.
+@@CODE@@cupcake/app/src/androidTest/java/com/example/cupcake/test/ScreenAssertions.kt
+@@CODE@@cupcake/app/src/androidTest/java/com/example/cupcake/test/ComposeTestRuleExtensions.kt
+@@P@@Вспомогательные методы navigateToFlavorScreen(), navigateToPickupScreen(), navigateToSummaryScreen() и navigateBack() выносят повторяющиеся действия по подготовке UI. Все тесты названы по схеме «объект_действие_результат»:
+@@BULLET@@cupcakeNavHost_verifyStartDestination — проверка стартового маршрута;
+@@BULLET@@cupcakeNavHost_verifyBackNavigationNotShownOnStartOrderScreen — отсутствие кнопки «Назад» на старте;
+@@BULLET@@cupcakeNavHost_clickOneCupcake_navigatesToSelectFlavorScreen — переход на экран вкуса;
+@@BULLET@@cupcakeNavHost_clickNextOnFlavorScreen_navigatesToPickupScreen — переход к дате получения;
+@@BULLET@@cupcakeNavHost_clickNextOnPickupScreen_navigatesToSummaryScreen — переход к итогам;
+@@BULLET@@тесты возврата кнопкой «Назад» с экранов Flavor и Pickup;
+@@BULLET@@тесты возврата кнопкой «Отмена» с экранов Flavor, Pickup и Summary.
+@@CODE@@cupcake/app/src/androidTest/java/com/example/cupcake/test/CupcakeScreenNavigationTest.kt
+@@H2@@4.2. Ручная проверка адаптивности
+@@P@@Проверка адаптивных макетов предполагает запуск приложения на изменяемом по размеру эмуляторе в режимах Phone, Unfolded foldable и Tablet (landscape) и сопоставление результатов с таблицей классов размера окна. Проверяются: наличие нижней навигации на компактном экране, Navigation rail на среднем, постоянного drawer и двухпанельного list-detail на расширенном; корректность отображения заголовков, отступов и схемы возврата (BackHandler / activity.finish()).
+@@CAPTION@@Таблица 4.1 — Ожидаемые результаты проверки адаптивности
+@@RAWCODE@@┌────────────────────────┬─────────────────────┬──────────────────────────────┬──────────────────────────┐
+@@RAWCODE@@│ Режим эмулятора        │ Класс ширины окна   │ Навигация                    │ Контент                  │
+@@RAWCODE@@├────────────────────────┼─────────────────────┼──────────────────────────────┼──────────────────────────┤
+@@RAWCODE@@│ Phone (портрет)        │ COMPACT             │ BottomNavigationBar          │ LIST_ONLY                │
+@@RAWCODE@@│ Unfolded foldable      │ MEDIUM              │ NavigationRail               │ LIST_ONLY                │
+@@RAWCODE@@│ Tablet (ландшафт)      │ EXPANDED            │ PermanentNavigationDrawer    │ LIST_AND_DETAIL          │
+@@RAWCODE@@└────────────────────────┴─────────────────────┴──────────────────────────────┴──────────────────────────┘
+@@NOTE@@Примечание: скриншоты эмулятора добавляются студентом после запуска проектов в Android Studio. В данном отчёте приведены описания проверок и листинги кода.
+@@H2@@4.3. Места для добавления скриншотов
+@@P@@Ниже оставлены заготовки под изображения. После запуска проектов вставьте скриншоты в отчёт через меню Word «Вставка → Рисунки» и замените текстовые подсказки на подписи рисунков.
+@@CAPTION@@Рисунок 4.1 — Cupcake: стартовый экран, выбор вкуса и итоговый заказ (добавить студентом)
+@@P@@[Место для скриншота 4.1]
+@@CAPTION@@Рисунок 4.2 — Reply: Phone / COMPACT — нижняя навигация, список писем (добавить студентом)
+@@P@@[Место для скриншота 4.2]
+@@CAPTION@@Рисунок 4.3 — Reply: Unfolded foldable / MEDIUM — Navigation rail (добавить студентом)
+@@P@@[Место для скриншота 4.3]
+@@CAPTION@@Рисунок 4.4 — Reply: Tablet landscape / EXPANDED — постоянный drawer и list-detail (добавить студентом)
+@@P@@[Место для скриншота 4.4]
+@@CAPTION@@Рисунок 4.5 — Lunch Tray: экран заказа и экран подтверждения (добавить студентом)
+@@P@@[Место для скриншота 4.5]
+@@CAPTION@@Рисунок 4.6 — «Мой город»: список мест и детали на компактном и широком экране (добавить студентом)
+@@P@@[Место для скриншота 4.6]
+@@H1@@5. Выводы
+@@P@@В ходе лабораторной работы были изучены и практически применены основные механизмы навигации в Jetpack Compose. Реализованы граф навигации с четырьмя и пятью пунктами назначения, передача данных между экранами через ViewModel, сброс состояния заказа, системный ShareSheet и динамический AppBar с кнопкой «Назад». Написаны инструментальные тесты, проверяющие маршруты и работу кнопок навигации.
+@@P@@При реализации адаптивного интерфейса были использованы классы размера окна, PermanentNavigationDrawer, NavigationRail и шаблон list-detail. Это позволило корректно использовать доступное экранное пространство на телефонах, складных устройствах и планшетах, а также правильно обрабатывать системную кнопку «Назад» в каждом режиме.
+@@P@@Контрольные задания закрепили материал: приложение Lunch Tray получило полноценную навигацию, а приложение «Мой город» было спроектировано с нуля с чётким разделением слоёв данных и интерфейса, ViewModel и адаптивными макетами. Таким образом, цели лабораторной работы достигнуты.
+@@H1@@6. Список использованных источников
+@@BULLET@@Методические указания к лабораторной работе № 7 «Навигация. Адаптив под разный формат экрана».
+@@BULLET@@Стартовый проект Cupcake: https://github.com/google-developer-training/basic-android-kotlin-compose-training-cupcake
+@@BULLET@@Стартовый проект Reply: https://github.com/google-developer-training/basic-android-kotlin-compose-training-reply-app
+@@BULLET@@Стартовый проект Lunch Tray: https://github.com/google-developer-training/basic-android-kotlin-compose-training-lunch-tray
+@@BULLET@@Руководство по адаптивным макетом Android: https://developer.android.com/develop/ui/compose/layouts/adaptive
+@@BULLET@@List-detail: https://developer.android.com/develop/ui/compose/layouts/adaptive/list-detail
+@@BULLET@@Supporting pane: https://developer.android.com/develop/ui/compose/layouts/adaptive/build-a-supporting-pane-layout

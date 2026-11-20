@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Мой город</string>
+
+    <!-- Titles of navigation routes (see MyCityScreen enum) -->
+    <string name="title_home">Мой город</string>
+    <string name="title_category">Рекомендации</string>
+    <string name="title_place">О месте</string>
+
+    <!-- Category names -->
+    <string name="category_restaurants">Рестораны</string>
+    <string name="category_parks">Парки</string>
+    <string name="category_cafes">Кофейни</string>
+    <string name="category_cinemas">Кинотеатры</string>
+    <string name="category_shopping">Торговые центры</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Главная</string>
+    <string name="back">Назад</string>
+    <string name="nav_drawer">Навигация по категориям</string>
+
+    <!-- Home screen -->
+    <string name="home_heading">Куда сходить?</string>
+    <string name="home_subtitle">Подборка интересных мест города: выберите категорию и найдите новое место для прогулки, ужина или кино.</string>
+    <string name="home_category_card">Категория: %1$s</string>
+    <string name="category_places_count">Мест в подборке: %1$d</string>
+
+    <!-- Place cards and details -->
+    <string name="place_image">Фотография места %1$s</string>
+    <string name="rating_label">Рейтинг %1$.1f</string>
+    <string name="address_label">Адрес</string>
+    <string name="about_label">О месте</string>
+    <string name="open_details">Подробнее</string>
+    <string name="add_favorite">Добавить в избранное</string>
+    <string name="remove_favorite">Удалить из избранного</string>
+    <string name="select_place_hint">Выберите место из списка слева, чтобы увидеть подробности</string>
+    <string name="place_not_found">Место не найдено</string>
+    <string name="places_empty">В этой категории пока нет мест</string>
+</resources>
